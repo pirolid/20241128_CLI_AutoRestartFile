@@ -73,55 +73,84 @@ class Program
 
     static void OpenFile(string filePath)
     {
-        try
+        int retryCount = 3;
+        int delay = 5000; // 5 seconds
+
+        for (int i = 0; i < retryCount; i++)
         {
-            if (!IsFileOpen(filePath))
+            try
             {
-                // Open the file
-                Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
-                currentFilePath = filePath;
-                //Console.WriteLine($"File '{filePath}' opened.");
+                if (!IsFileOpen(filePath))
+                {
+                    // Open the file
+                    Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+                    currentFilePath = filePath;
+                    Console.WriteLine("");
+                    Console.WriteLine($"File '{filePath}' opened.");
+                    return;
+                }
+                else
+                {
+                    Console.WriteLine($"File already open '{filePath}'.");
+                    return;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Console.WriteLine($"File already open '{filePath}'.");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Error opening file: {ex.Message}");
+                if (i < retryCount - 1)
+                {
+                    Console.WriteLine($"Retrying in {delay / 1000} seconds...");
+                    Thread.Sleep(delay);
+                }
             }
         }
-        catch (Exception ex)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Error opening file: {ex.Message}");
-        }
+        Console.WriteLine("Failed to open the file after multiple attempts.");
     }
 
     static void CloseFile(string filePath)
     {
-        try
+        int retryCount = 3;
+        int delay = 5000; // 5 seconds
+
+        for (int i = 0; i < retryCount; i++)
         {
-            if (IsFileOpen(filePath))
+            try
             {
-                // Close the file
-                foreach (var process in Process.GetProcessesByName("EXCEL"))
+                if (IsFileOpen(filePath))
                 {
-                    if (process.MainWindowTitle.Contains(Path.GetFileNameWithoutExtension(filePath)))
+                    // Close the file
+                    foreach (var process in Process.GetProcessesByName("EXCEL"))
                     {
-                        process.Kill();
-                        currentFilePath = null;
-                        //Console.WriteLine($"File '{filePath}' closed.");
-                        break;
+                        if (process.MainWindowTitle.Contains(Path.GetFileNameWithoutExtension(filePath)))
+                        {
+                            process.Kill();
+                            currentFilePath = null;
+                            Console.WriteLine("");
+                            Console.WriteLine($"File '{filePath}' closed.");
+                            return;
+                        }
                     }
                 }
+                else
+                {
+                    Console.WriteLine($"File already closed '{filePath}'.");
+                    return;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Console.WriteLine($"File already open '{filePath}'.");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Error closing file: {ex.Message}");
+                if (i < retryCount - 1)
+                {
+                    Console.WriteLine($"Retrying in {delay / 1000} seconds...");
+                    Thread.Sleep(delay);
+                }
             }
         }
-        catch (Exception ex)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Error closing file: {ex.Message}");
-        }
+        Console.WriteLine("Failed to close the file after multiple attempts.");
     }
 
     static bool IsFileOpen(string filePath)
@@ -162,6 +191,7 @@ class Program
         timer.Enabled = true;
 
         Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine("");
         CenterText($"Timer started. Restarting every {interval} minutes.");
         StartCountdown(interval);
     }
