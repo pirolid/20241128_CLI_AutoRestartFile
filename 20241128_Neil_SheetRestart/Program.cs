@@ -30,10 +30,10 @@ class Program
     {
         bool fileFound = false;
 
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"Looking for '{fileName}' sheet...");
+        Console.ForegroundColor = ConsoleColor.Blue;
+        CenterText($"Looking for '{fileName}' sheet...");
         Console.ForegroundColor = ConsoleColor.White;
-        Console.WriteLine($"...in {directoryPath}");
+        CenterText($"...in {directoryPath}");
 
         foreach (var extension in extensions)
         {
@@ -42,8 +42,8 @@ class Program
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("");
-                Console.WriteLine($"File '{fileName}{extension}' found.");
-                Console.WriteLine($"In '{directoryPath}'.");
+                CenterText($"File '{fileName}{extension}' found.");
+                //Console.WriteLine($"In '{directoryPath}'.");
 
                 // Set the current file path without opening the file
                 currentFilePath = filePath;
@@ -57,9 +57,14 @@ class Program
         if (!fileFound)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"File '{fileName}' not found.");
+            CenterText($"File '{fileName}' not found.");
             Console.WriteLine("");
-            Console.WriteLine("Please move this script to the same folder as the 'prices'.");
+            CenterText("Please ensure this script is placed in the same folder as the 'prices' file.");
+            Console.WriteLine("");
+            CenterText("Press any key to exit...");
+            Console.ResetColor();
+            Console.ReadKey(); // Wait for the user to press any key
+            Environment.Exit(0); // Exit the program
         }
 
         // Reset console color
@@ -79,7 +84,7 @@ class Program
             }
             else
             {
-                Console.WriteLine($"File '{filePath}' is already open.");
+                Console.WriteLine($"File already open '{filePath}'.");
             }
         }
         catch (Exception ex)
@@ -109,7 +114,7 @@ class Program
             }
             else
             {
-                Console.WriteLine($"Cannot close the file '{filePath}' because it is not currently open.");
+                Console.WriteLine($"File already open '{filePath}'.");
             }
         }
         catch (Exception ex)
@@ -134,7 +139,7 @@ class Program
     static double TimerRefreshMinutes()
     {
         Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.Write("Enter restart timer in minutes: ");
+        CenterText("Enter restart timer in minutes: ", true);
         if (double.TryParse(Console.ReadLine(), out double interval))
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -143,7 +148,7 @@ class Program
         else
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Invalid input. Please enter a valid number.");
+            CenterText("Invalid input. Please enter a valid number.");
             return TimerRefreshMinutes(); // Recursively ask for input again
         }
     }
@@ -156,7 +161,7 @@ class Program
         timer.Enabled = true;
 
         Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"Timer started. Restarting every {interval} minutes.");
+        CenterText($"Timer started. Restarting every {interval} minutes.");
     }
 
     static void OnTimedEvent(object? source, ElapsedEventArgs e)
@@ -167,7 +172,7 @@ class Program
         Console.Write(new string(' ', Console.WindowWidth)); // Clear the line
         Console.SetCursorPosition(0, Console.CursorTop);
         Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"Restarted at {now:HH:mm}. \r Scheduled next restart in {interval} minutes at {nextRestart:HH:mm}.");
+        CenterText($"Restarted at {now:HH:mm}. \r Scheduled next restart in {interval} minutes at {nextRestart:HH:mm}.");
 
         // Close and reopen the file
         if (currentFilePath != null)
@@ -175,6 +180,22 @@ class Program
             string filePath = currentFilePath; // Store the current file path
             CloseFile(filePath);
             OpenFile(filePath);
+        }
+    }
+
+    static void CenterText(string text, bool inputPrompt = false)
+    {
+        int windowWidth = Console.WindowWidth;
+        int textLength = text.Length;
+        int spaces = (windowWidth - textLength) / 2;
+        if (inputPrompt)
+        {
+            Console.SetCursorPosition(spaces, Console.CursorTop);
+            Console.Write(text);
+        }
+        else
+        {
+            Console.WriteLine(new string(' ', spaces) + text);
         }
     }
 }
