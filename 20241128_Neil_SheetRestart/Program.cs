@@ -140,6 +140,7 @@ class Program
     {
         Console.ForegroundColor = ConsoleColor.Cyan;
         CenterText("Enter restart timer in minutes: ", true);
+        Console.Write("");
         if (double.TryParse(Console.ReadLine(), out double interval))
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -162,6 +163,23 @@ class Program
 
         Console.ForegroundColor = ConsoleColor.Green;
         CenterText($"Timer started. Restarting every {interval} minutes.");
+        StartCountdown(interval);
+    }
+
+    static void StartCountdown(double minutes)
+    {
+        int totalSeconds = (int)(minutes * 60);
+        while (totalSeconds > 0)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.SetCursorPosition(0, Console.CursorTop);
+            CenterText($"Time until next restart: {totalSeconds / 60:D2}:{totalSeconds % 60:D2}  ", true);
+            Thread.Sleep(1000);
+            totalSeconds--;
+        }
+        Console.SetCursorPosition(0, Console.CursorTop);
+        Console.Write(new string(' ', Console.WindowWidth)); // Clear the line
+        Console.SetCursorPosition(0, Console.CursorTop);
     }
 
     static void OnTimedEvent(object? source, ElapsedEventArgs e)
@@ -173,6 +191,7 @@ class Program
         Console.SetCursorPosition(0, Console.CursorTop);
         Console.ForegroundColor = ConsoleColor.Green;
         CenterText($"Restarted at {now:HH:mm}. \r Scheduled next restart in {interval} minutes at {nextRestart:HH:mm}.");
+        Console.Write("");
 
         // Close and reopen the file
         if (currentFilePath != null)
@@ -181,6 +200,8 @@ class Program
             CloseFile(filePath);
             OpenFile(filePath);
         }
+
+        StartCountdown(interval); // Restart the countdown after each timer event
     }
 
     static void CenterText(string text, bool inputPrompt = false)
