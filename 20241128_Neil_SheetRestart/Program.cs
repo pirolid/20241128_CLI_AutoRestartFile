@@ -40,8 +40,8 @@ class Program
                 Console.WriteLine($"File '{fileName}{extension}' found.");
                 Console.WriteLine($"In directory '{directoryPath}'.");
 
-                // Open the file
-                OpenFile(filePath);
+                // Set the current file path without opening the file
+                currentFilePath = filePath;
 
                 Console.WriteLine("");
                 fileFound = true;
@@ -65,7 +65,7 @@ class Program
     {
         try
         {
-            if (currentFilePath == null)
+            if (!IsFileOpen(filePath))
             {
                 // Open the file
                 Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
@@ -88,7 +88,7 @@ class Program
     {
         try
         {
-            if (currentFilePath != null)
+            if (IsFileOpen(filePath))
             {
                 // Close the file
                 foreach (var process in Process.GetProcessesByName("EXCEL"))
