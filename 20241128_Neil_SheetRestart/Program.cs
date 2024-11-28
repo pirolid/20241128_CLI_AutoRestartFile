@@ -238,15 +238,24 @@ class Program
     {
         int windowWidth = Console.WindowWidth;
         int textLength = text.Length;
-        int spaces = (windowWidth - textLength) / 2;
-        if (inputPrompt)
+        int spaces = Math.Max((windowWidth - textLength) / 2, 0); // Ensure spaces is non-negative
+
+        if (textLength > windowWidth)
         {
-            Console.SetCursorPosition(spaces, Console.CursorTop);
-            Console.Write(text);
+            // If the text is longer than the window width, print it without centering
+            Console.WriteLine(text);
         }
         else
         {
-            Console.WriteLine(new string(' ', spaces) + text);
+            if (inputPrompt)
+            {
+                Console.SetCursorPosition(spaces, Console.CursorTop);
+                Console.Write(text);
+            }
+            else
+            {
+                Console.WriteLine(new string(' ', spaces) + text);
+            }
         }
     }
 }
