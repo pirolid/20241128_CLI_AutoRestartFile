@@ -18,7 +18,12 @@ class Program
         FindFile(directoryPath, fileName, extensions);
         interval = TimerRefreshMinutes();
         StartTimer();
-        ExitProgram();
+
+        // Keep the program running indefinitely
+        while (true)
+        {
+            Thread.Sleep(1000);
+        }
     }
 
     static void FindFile(string directoryPath, string fileName, string[] extensions)
@@ -28,7 +33,7 @@ class Program
         Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine($"Looking for '{fileName}' sheet...");
         Console.ForegroundColor = ConsoleColor.White;
-        Console.WriteLine($"Search current folder: {directoryPath}");
+        Console.WriteLine($"...in {directoryPath}");
 
         foreach (var extension in extensions)
         {
@@ -38,7 +43,7 @@ class Program
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("");
                 Console.WriteLine($"File '{fileName}{extension}' found.");
-                Console.WriteLine($"In directory '{directoryPath}'.");
+                Console.WriteLine($"In '{directoryPath}'.");
 
                 // Set the current file path without opening the file
                 currentFilePath = filePath;
@@ -54,7 +59,7 @@ class Program
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"File '{fileName}' not found.");
             Console.WriteLine("");
-            Console.WriteLine("Please move this script to the same folder as the 'prices' Excel sheet.");
+            Console.WriteLine("Please move this script to the same folder as the 'prices'.");
         }
 
         // Reset console color
@@ -70,7 +75,7 @@ class Program
                 // Open the file
                 Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
                 currentFilePath = filePath;
-                Console.WriteLine($"File '{filePath}' opened.");
+                //Console.WriteLine($"File '{filePath}' opened.");
             }
             else
             {
@@ -97,14 +102,14 @@ class Program
                     {
                         process.Kill();
                         currentFilePath = null;
-                        Console.WriteLine($"File '{filePath}' closed.");
+                        //Console.WriteLine($"File '{filePath}' closed.");
                         break;
                     }
                 }
             }
             else
             {
-                Console.WriteLine($"File '{filePath}' is not open.");
+                Console.WriteLine($"Cannot close the file '{filePath}' because it is not currently open.");
             }
         }
         catch (Exception ex)
@@ -152,25 +157,6 @@ class Program
 
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine($"Timer started. Restarting every {interval} minutes.");
-
-        // Start the countdown
-        StartCountdown(interval);
-    }
-
-    static void StartCountdown(double minutes)
-    {
-        int totalSeconds = (int)(minutes * 60);
-        while (totalSeconds > 0)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.SetCursorPosition(0, Console.CursorTop);
-            Console.Write($"Time until next restart: {totalSeconds / 60:D2}:{totalSeconds % 60:D2}  ");
-            Thread.Sleep(1000);
-            totalSeconds--;
-        }
-        Console.SetCursorPosition(0, Console.CursorTop);
-        Console.Write(new string(' ', Console.WindowWidth)); // Clear the line
-        Console.SetCursorPosition(0, Console.CursorTop);
     }
 
     static void OnTimedEvent(object? source, ElapsedEventArgs e)
@@ -181,7 +167,7 @@ class Program
         Console.Write(new string(' ', Console.WindowWidth)); // Clear the line
         Console.SetCursorPosition(0, Console.CursorTop);
         Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"Restarted at {now:HH:mm}. Scheduled next restart in {interval} minutes at {nextRestart:HH:mm}.");
+        Console.WriteLine($"Restarted at {now:HH:mm}. \r Scheduled next restart in {interval} minutes at {nextRestart:HH:mm}.");
 
         // Close and reopen the file
         if (currentFilePath != null)
@@ -190,22 +176,5 @@ class Program
             CloseFile(filePath);
             OpenFile(filePath);
         }
-
-        StartCountdown(interval); // Restart the countdown after each timer event
-    }
-
-    static void ExitProgram()
-    {
-        // Keep the console window open for troubleshooting
-        Console.ForegroundColor = ConsoleColor.Magenta;
-        Console.WriteLine("");
-        Console.WriteLine("Press Escape key to exit...");
-        while (Console.ReadKey(true).Key != ConsoleKey.Escape)
-        {
-            // Wait for the Escape key to be pressed
-        }
-        timer?.Stop();
-        timer?.Dispose();
-        Environment.Exit(0); // Exit the program immediately
     }
 }
