@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Timers;
+using System.Diagnostics;
 
 class Program
 {
@@ -37,6 +38,10 @@ class Program
                 Console.WriteLine("");
                 Console.WriteLine($"File '{fileName}{extension}' found.");
                 Console.WriteLine($"In directory '{directoryPath}'.");
+
+                // Open the file
+                Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+
                 Console.WriteLine("");
                 fileFound = true;
                 break;
