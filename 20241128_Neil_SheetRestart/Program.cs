@@ -2,6 +2,7 @@
 using System.IO;
 using System.Timers;
 using System.Diagnostics;
+using OfficeOpenXml; // Install-Package EPPlus
 
 class Program
 {
@@ -11,6 +12,9 @@ class Program
 
     static void Main()
     {
+        // Ensure EPPlus is licensed
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // Add this line
+
         string directoryPath = Directory.GetCurrentDirectory();
         string fileName = "prices";
         string[] extensions = { ".xlsx", ".xls", ".xlsm", ".xlsb" };
@@ -120,17 +124,13 @@ class Program
             {
                 if (IsFileOpen(filePath))
                 {
-                    // Close the file
-                    foreach (var process in Process.GetProcessesByName("EXCEL"))
+                    // Close the file using EPPlus
+                    using (var package = new ExcelPackage(new FileInfo(filePath)))
                     {
-                        if (process.MainWindowTitle.Contains(Path.GetFileNameWithoutExtension(filePath)))
-                        {
-                            process.Kill();
-                            currentFilePath = null;
-                            Console.WriteLine("");
-                            Console.WriteLine($"File '{filePath}' closed.");
-                            return;
-                        }
+                        package.Save(); // Save any changes
+                        currentFilePath = null;
+                        Console.WriteLine($"File '{filePath}' closed.");
+                        return;
                     }
                 }
                 else

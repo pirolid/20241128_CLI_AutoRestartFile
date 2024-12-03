@@ -12,4 +12,9 @@
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="EPPlus" Version="7.5.1" />
+    <PackageReference Include="EPPlus.System.Drawing" Version="7.5.0" />
+  </ItemGroup>
+
 </Project>
